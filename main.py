@@ -53,26 +53,6 @@ schema_18 = StructType([
             StructField('bytes_received', StringType(), True),
             StructField('duration', StringType(), True)])
 
-# schema_18_types = StructType([
-#             StructField('date', DateType(), True),
-#             StructField('time', TimestampType(), True), 
-#             StructField('server_ip', StringType(), True),
-#             StructField('method', StringType(), True),
-#             StructField('uri_stem', StringType(), True),
-#             StructField('uri_query', StringType(), True),
-#             StructField('server_port', IntegerType(), True),
-#             StructField('username', StringType(), True),
-#             StructField('client_ip', StringType(), True),
-#             StructField('client_browser', StringType(), True),
-#             StructField('client_cookie', StringType(), True),
-#             StructField('client_referrer', StringType(), True),
-#             StructField('status', IntegerType(), True),
-#             StructField('substatus', IntegerType(), True),
-#             StructField('win32_status', IntegerType(), True),
-#             StructField('bytes_sent', IntegerType(), True),
-#             StructField('bytes_received', IntegerType(), True),
-#             StructField('duration', IntegerType(), True)])
-
 schema_14 = StructType([
             StructField('date', StringType(), True),
             StructField('time', StringType(), True), 
@@ -93,21 +73,19 @@ s3_client = boto3.client('s3',
             aws_access_key_id=aws_access_key,
             aws_secret_access_key=aws_secret_key)
 
+######## CODE TO ITERATE THROUGH ALL OBJECTS IN S3 BUCKET ########
 # bucket_contents = s3_client.list_objects(Bucket='la-ticket-bucket-eu', Prefix='BI_logs_small/')
 # file_names = []
 # for i in bucket_contents['Contents']:
 #     file_names.append(i['Key'])
 # file_names.pop(0) # remove 'BI_logs' folder name from list, because it's not a specific file name
 # for log in file_names:
-
-# files = ['BI_logs/u_ex110209.log', 'BI_logs/u_ex091123.log']
-
-# for i in files:
+######## DOES NOT WORK FOR MULTIPLE FILES, NEED TO INVESTIGATE ########
 
 file_object = s3_client.get_object(Bucket='la-ticket-bucket-eu', 
                                         Key='BI_logs/u_ex100106.log')
 file_contents = file_object['Body'].read().decode().split('\n')
-# print(f'------------------------------------{log}-----------------------------------')
+
 
 # logs with 18 columns
 logs_18 = []
@@ -150,8 +128,7 @@ if logs_14 == [['']]:
     pass
 else:
     para_logs_14 = sc.parallelize(logs_14, 10)
-
-    df_14        = spark.createDataFrame(para_logs_14, schema_14)
+    df_14 = spark.createDataFrame(para_logs_14, schema_14)
     
     df_14 = df_14.withColumn('date', df_14['date'].cast(DateType()))
     df_14 = df_14.withColumn('time', df_14['time'].cast(TimestampType()))
