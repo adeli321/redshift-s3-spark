@@ -6,8 +6,16 @@ from pyspark.sql.types import *
 
 ########
 # TO TEST LOCALLY
-# spark-submit --jars jar_files/hadoop-common-2.7.3.jar,jar_files/hadoop-aws-2.7.3.jar,jar_files/aws-java-sdk-1.7.4.jar main.py
+# pyspark --packages com.databricks:spark-redshift_2.10:3.0.0-preview1 --jars RedshiftJDBC42-no-awssdk-1.2.20.1043.jar,aws-java-sdk-1.11.534.jar
+# pyspark --packages com.databricks:spark-redshift_2.10:3.0.0-preview1,org.apache.hadoop:hadoop-aws:3.2.0 --jars RedshiftJDBC42-no-awssdk-1.2.20.1043.jar,jar_files
+# pyspark --packages com.databricks:spark-redshift_2.10:3.0.0-preview1,org.apache.hadoop:hadoop-aws:3.2.0 --jars jar_files
+# pyspark --packages org.apache.hadoop:hadoop-aws:3.2.0 --jars jar_files
 ########
+# pyspark --packages org.apache.hadoop:hadoop-aws:2.7.0 --jars hadoop-aws-2.7.0.jar
+########
+# spark-submit --packages org.apache.hadoop:hadoop-aws:2.7.0 --jars hadoop-aws-2.7.0.jar --py-files dependencies.zip main.py
+# spark-submit --packages org.apache.hadoop:hadoop-aws:3.1.2
+# spark-submit --jars jar_files/hadoop-common-2.7.3.jar,jar_files/hadoop-aws-2.7.3.jar,jar_files/aws-java-sdk-1.7.4.jar main.py
 
 aws_access_key = os.environ.get('AWS_ACCESS_KEY')
 aws_secret_key = os.environ.get('AWS_SECRET_KEY')
@@ -16,9 +24,14 @@ spark = SparkSession.builder \
                     .master('local') \
                     .appName('RedshiftEtl') \
                     .getOrCreate()
+                    # .config("fs.s3n.impl", "org.apache.hadoop.fs.s3native.NativeS3FileSystem") \
+                    # .getOrCreate()
+# SparkConf().getAll()
 sc = spark.sparkContext
+
 sc._jsc.hadoopConfiguration().set("fs.s3a.access.key", aws_access_key)
 sc._jsc.hadoopConfiguration().set("fs.s3a.secret.key", aws_secret_key)
+# sc._jsc.hadoopConfiguration().set("fs.s3n.impl", "org.apache.hadoop.fs.s3native.NativeS3FileSystem")
 
 # Schema for the 18 columns of logs to be loaded as strings initially
 schema_18 = StructType([
@@ -61,9 +74,19 @@ s3_client = boto3.client('s3',
             aws_access_key_id=aws_access_key,
             aws_secret_access_key=aws_secret_key)
 
+######## CODE TO ITERATE THROUGH ALL OBJECTS IN S3 BUCKET ########
+# bucket_contents = s3_client.list_objects(Bucket='la-ticket-bucket-eu', Prefix='BI_logs_small/')
+# file_names = []
+# for i in bucket_contents['Contents']:
+#     file_names.append(i['Key'])
+# file_names.pop(0) # remove 'BI_logs' folder name from list, because it's not a specific file name
+# for log in file_names:
+######## DOES NOT WORK FOR MULTIPLE FILES, NEED TO INVESTIGATE ########
+
 file_object = s3_client.get_object(Bucket='la-ticket-bucket-eu', 
                                         Key='BI_logs/u_ex100106.log')
 file_contents = file_object['Body'].read().decode().split('\n')
+
 
 # logs with 18 columns
 logs_18 = []
@@ -118,3 +141,14 @@ else:
 
     df_14.write.mode('append').save('s3a://la-ticket-bucket-eu/spark-etl5')
     print('Wrote DF to spark-etl5 14 columns')
+
+######## Attempt to write from spark directly to AWS Redshift
+######## Apparently this is bad practice, so writing to s3 instead
+# df_18.write \
+#   .format("com.databricks.spark.redshift") \
+#   .option("url", "jdbc:redshift://la-tickets.cwnesvytuyhn.eu-west-1.redshift.amazonaws.com:5439/dev?user=awsuser&password=Lovesaws22") \
+#   .option("dbtable", "sparktest") \
+#   .option("tempdir", "s3://la-ticket-bucket-eu/spark-etl-temp") \
+#   .option("aws_iam_role", "arn:aws:iam::900056063831:role/aws-service-role/redshift.amazonaws.com/AWSServiceRoleForRedshift") \
+#   .mode("append") \
+#   .save()
