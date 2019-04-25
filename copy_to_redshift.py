@@ -1,10 +1,6 @@
 import os
 from redshift_connect import UseRedshift
 
-# This script creates a table in Redshift if it doesn't
-# exist, then it takes Parquet files from an s3 bucket and 
-# copies them to the table (sparktest) in Redshift
-
 db_name        = os.environ.get('DB_NAME')
 redshift_user  = os.environ.get('REDSHIFT_USER')
 redshift_pw    = os.environ.get('REDSHIFT_PW')
