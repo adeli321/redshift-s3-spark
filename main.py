@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
+########
+# TO TEST LOCALLY
+# spark-submit --jars jar_files/hadoop-common-2.7.3.jar,jar_files/hadoop-aws-2.7.3.jar,jar_files/aws-java-sdk-1.7.4.jar main.py
+########
+
 import os
 import boto3
 from pyspark import SparkConf
 from pyspark.sql import SparkSession 
 from pyspark.sql.types import *
-
-########
-# TO TEST LOCALLY
-# spark-submit --jars jar_files/hadoop-common-2.7.3.jar,jar_files/hadoop-aws-2.7.3.jar,jar_files/aws-java-sdk-1.7.4.jar main.py
-########
 
 aws_access_key = os.environ.get('AWS_ACCESS_KEY')
 aws_secret_key = os.environ.get('AWS_SECRET_KEY')
