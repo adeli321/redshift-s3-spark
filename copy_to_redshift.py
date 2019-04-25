@@ -1,6 +1,9 @@
 import os
 from redshift_connect import UseRedshift
 
+# This script takes Parquet files from an s3 bucket and 
+# copies them to a table (sparktest) in Redshift
+
 aws_access_key = os.environ.get('AWS_ACCESS_KEY')
 aws_secret_key = os.environ.get('AWS_SECRET_KEY')
 db_name        = os.environ.get('DB_NAME')

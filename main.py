@@ -4,6 +4,10 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession 
 from pyspark.sql.types import *
 
+# This script takes a log file from s3,
+# extracts and transforms its data types, and
+# appends the Parquet files back to s3
+
 ########
 # TO TEST LOCALLY
 # spark-submit --jars jar_files/hadoop-common-2.7.3.jar,jar_files/hadoop-aws-2.7.3.jar,jar_files/aws-java-sdk-1.7.4.jar main.py
