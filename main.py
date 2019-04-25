@@ -152,4 +152,3 @@ else:
 #   .option("aws_iam_role", "arn:aws:iam::900056063831:role/aws-service-role/redshift.amazonaws.com/AWSServiceRoleForRedshift") \
 #   .mode("append") \
 #   .save()
-

@@ -28,5 +28,3 @@ def copy_to_redshift():
 
 if __name__ == '__main__':
     copy_to_redshift()
-
-
