@@ -15,6 +15,7 @@ from pyspark.sql.types import *
 ########
 # spark-submit --packages org.apache.hadoop:hadoop-aws:2.7.0 --jars hadoop-aws-2.7.0.jar --py-files dependencies.zip main.py
 # spark-submit --packages org.apache.hadoop:hadoop-aws:3.1.2
+# spark-submit --jars jar_files/hadoop-common-2.7.3.jar,jar_files/hadoop-aws-2.7.3.jar,jar_files/aws-java-sdk-1.7.4.jar main.py
 
 aws_access_key = os.environ.get('AWS_ACCESS_KEY')
 aws_secret_key = os.environ.get('AWS_SECRET_KEY')

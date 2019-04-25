@@ -15,10 +15,18 @@ redshift_db_config = {'dbname': db_name,
                     'user': redshift_user,
                     'password': redshift_pw}
 
-with UseRedshift(redshift_db_config) as cursor: 
-    SQL = rf"""COPY public.sparktest FROM 's3://la-ticket-bucket-eu/spark-etl5'
-        IAM_ROLE 'arn:aws:iam::900056063831:role/RedshiftCopyUnload'
-        FORMAT AS PARQUET;"""
-    cursor.execute(SQL)
+def copy_to_redshift():
+    """ Executes an SQL command to copy s3 folder to a Redshift table """
+    try:
+        with UseRedshift(redshift_db_config) as cursor: 
+            SQL = rf"""COPY public.sparktest FROM 's3://la-ticket-bucket-eu/spark-etl5'
+                IAM_ROLE 'arn:aws:iam::900056063831:role/RedshiftCopyUnload'
+                FORMAT AS PARQUET;"""
+            cursor.execute(SQL)
+    except Exception as err:
+        print('Error: ', err)
+
+if __name__ == '__main__':
+    copy_to_redshift()
 
 
