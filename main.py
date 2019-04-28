@@ -19,8 +19,8 @@ spark = SparkSession.builder \
                     .appName('RedshiftEtl') \
                     .getOrCreate()
 sc = spark.sparkContext
-sc._jsc.hadoopConfiguration().set("fs.s3a.access.key", aws_access_key)
-sc._jsc.hadoopConfiguration().set("fs.s3a.secret.key", aws_secret_key)
+sc._jsc.hadoopConfiguration().set('fs.s3a.access.key', aws_access_key)
+sc._jsc.hadoopConfiguration().set('fs.s3a.secret.key', aws_secret_key)
 
 # Schema for the 18 columns of logs to be loaded as strings initially
 schema_18 = StructType([
