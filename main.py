@@ -9,6 +9,7 @@ import os
 import boto3
 from pyspark import SparkConf
 from pyspark.sql import SparkSession 
+
 from pyspark.sql.types import StructType, StructField, DateType, StringType, TimestampType, IntegerType
 # from pyspark.sql.types import *
 
@@ -104,6 +105,7 @@ def transform_logs(file_contents):
         para_logs_18 = sc.parallelize(logs_18, 10)
         # Create a dataframe from RDD using the schema previously made
         df_18 = spark.createDataFrame(para_logs_18, schema_18)
+
         # Write dataframe as n number of Parquet files to S3
         df_18.write.mode('append').save('s3a://la-ticket-bucket-eu/spark-etl5')
         print('Wrote DF to spark-etl5 18 columns')
